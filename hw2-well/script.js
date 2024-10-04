@@ -2,7 +2,7 @@
 // 定義變數
 let canvas = document.getElementById("myCanvas");
 let ctx = canvas.getContext("2d");
-let x = -50, y = -50, dx = 10, dy = 10, r = 30,i=0;
+let x = 0, y = 0, dx = 10, dy = 10, r = 30,i=0;
 let color = ["#FFB5B5","#FFD0FF","#E6CAFF","#CEFFCE"];;
 let cmv =0;
 
