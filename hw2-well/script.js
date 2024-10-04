@@ -32,6 +32,7 @@ function mousemove(e)
 	if (cmv){
 		x=e.clientX-canvas.offsetLeft;
 		y=e.clientY-canvas.offsetTop;
+		color='#'+i;
 	}
 }
 
@@ -39,7 +40,8 @@ document.addEventListener("mousedown",mousedown)
 document.addEventListener("mouseup",mouseup)
 function mousedown(e){
 	cmv=1;
-	color = '#'+Math.floor(Math.random()*16777215).toString(16);
+	i=Math.floor(Math.random()*16777215).toString(16);
+
 	
 
 }
