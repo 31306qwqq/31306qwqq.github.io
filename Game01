@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抽卡 + 拍照解鎖遊戲</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        #card-container { margin: 20px; }
+        .card { display: inline-block; padding: 10px; border: 1px solid #ccc; margin: 5px; }
+        video, canvas { display: none; }
+    </style>
+</head>
+<body>
+    <h1>抽卡遊戲</h1>
+    <p>剩餘免費抽卡次數：<span id="draw-count">3</span></p>
+    <button id="draw-card">抽卡</button>
+    
+    <h2>你的卡片</h2>
+    <div id="card-container"></div>
+
+    <h2>拍照解鎖新卡片</h2>
+    <button id="open-camera">開啟相機</button>
+    <video id="video" autoplay></video>
+    <button id="capture" style="display:none;">拍照</button>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // 卡片列表
+        const cards = ["卡片 A", "卡片 B", "卡片 C", "卡片 D", "卡片 E"];
+        
+        // 讀取已解鎖的卡片
+        let unlockedCards = JSON.parse(localStorage.getItem("unlockedCards")) || [];
+        let freeDraws = parseInt(localStorage.getItem("freeDraws")) || 3;
+        
+        document.getElementById("draw-count").innerText = freeDraws;
+        const cardContainer = document.getElementById("card-container");
+
+        function updateCardDisplay() {
+            cardContainer.innerHTML = "";
+            unlockedCards.forEach(card => {
+                let div = document.createElement("div");
+                div.className = "card";
+                div.innerText = card;
+                cardContainer.appendChild(div);
+            });
+            localStorage.setItem("unlockedCards", JSON.stringify(unlockedCards));
+        }
+
+        // 抽卡功能
+        document.getElementById("draw-card").addEventListener("click", () => {
+            if (freeDraws > 0) {
+                let newCard = cards[Math.floor(Math.random() * cards.length)];
+                unlockedCards.push(newCard);
+                freeDraws--;
+                document.getElementById("draw-count").innerText = freeDraws;
+                localStorage.setItem("freeDraws", freeDraws);
+                updateCardDisplay();
+            } else {
+                alert("免費抽卡次數已用完，請到景點拍照解鎖新卡片！");
+            }
+        });
+
+        updateCardDisplay();
+
+        // 拍照功能
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
+        const context = canvas.getContext("2d");
+        const captureButton = document.getElementById("capture");
+
+        document.getElementById("open-camera").addEventListener("click", async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                video.style.display = "block";
+                captureButton.style.display = "block";
+            } catch (err) {
+                alert("無法開啟相機：" + err);
+            }
+        });
+
+        captureButton.addEventListener("click", () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            video.style.display = "none";
+            captureButton.style.display = "none";
+
+            // 模擬拍照後解鎖新卡片
+            let newCard = cards[Math.floor(Math.random() * cards.length)];
+            unlockedCards.push(newCard);
+            updateCardDisplay();
+            alert("拍照成功！你獲得了新卡片：" + newCard);
+
+            // 關閉相機
+            video.srcObject.getTracks().forEach(track => track.stop());
+        });
+    </script>
+</body>
+</html>
